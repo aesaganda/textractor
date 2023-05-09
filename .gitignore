@@ -1,0 +1,3 @@
+node_modules
+*.traineddata
+.DS_Store

@@ -1,0 +1,30 @@
+{
+  "name": "textractor",
+  "version": "1.0.0",
+  "description": "Textractor OCR",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "start-gendoc": "nodemon swagger.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aesaganda/textractor.git"
+  },
+  "keywords": [
+    "ocr"
+  ],
+  "author": "aesaganda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aesaganda/textractor/issues"
+  },
+  "homepage": "https://github.com/aesaganda/textractor#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^2.0.22",
+    "swagger-autogen": "^2.23.1",
+    "tesseract.js": "^4.0.5"
+  }
+}
