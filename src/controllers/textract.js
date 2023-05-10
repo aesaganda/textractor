@@ -14,6 +14,7 @@ const imageRecognize = async (req, res) => {
   try {
     // Recognize text in image using Tesseract.js
     const worker = await createWorker({
+      // langPath: "../../lang-data/",
       logger: (m) => console.log(m),
     });
 
@@ -35,20 +36,31 @@ const imageRecognize = async (req, res) => {
 };
 
 const imageDetect = async (req, res) => {
+  const { imageUrl } = req.body;
+
+  if (!imageUrl) {
+    return res.status(400).send("Missing imageUrl");
+  }
+
   try {
     // Detect text in image using Tesseract.js
-    const path = require("path");
-    const Tesseract = require("tesseract.js");
-
-    const [, , imagePath] = process.argv;
-    // const image = path.resolve(__dirname, (imagePath || '../../tests/assets/images/cosmic.png'));
-
-    const image = "https://tesseract.projectnaptha.com/img/eng_bw.png";
-    console.log(`Recognizing ${image}`);
-
-    Tesseract.detect(image, { logger: (m) => console.log(m) }).then(({ data }) => {
-      console.log(data);
+    const worker = await createWorker({
+      // langPath: "../../lang-data",
+      logger: (m) => console.log(m),
     });
+
+    await worker.loadLanguage("osd");
+    await worker.initialize("osd");
+
+    const myImage = imageUrl;
+
+    const {
+      data: { text },
+    } = await worker.detect(myImage);
+
+    await worker.terminate();
+
+    res.status(200).send(text);
   } catch (error) {
     res.status(500).send("An error occurred while processing the image.");
   }
