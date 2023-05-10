@@ -1,5 +1,5 @@
 const { createWorker } = require("tesseract.js");
-const fs = require('fs');
+const fs = require("fs");
 
 const imageRecognize = async (req, res) => {
   const { imageUrl, language } = req.body;
@@ -93,11 +93,11 @@ const downloadPDF = async (req, res) => {
 
     const {
       data: { text, pdf },
-    } = await worker.recognize(myImage, { pdfTitle: 'Textractor Result' }, { pdf: true });
+    } = await worker.recognize(myImage, { pdfTitle: "Textractor Result" }, { pdf: true });
     console.log(text);
 
-    fs.writeFileSync('textractor-result.pdf', Buffer.from(pdf));
-    console.log('Generate PDF: textractor-result.pdf');
+    fs.writeFileSync("textractor-result.pdf", Buffer.from(pdf));
+    console.log("Generate PDF: textractor-result.pdf");
     await worker.terminate();
 
     res.status(200).send(text);
