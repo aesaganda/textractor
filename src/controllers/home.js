@@ -1,3 +1,4 @@
+require("dotenv").config();
 const Language = require("../model/languages");
 
 const getlanguages = async (req, res) => {

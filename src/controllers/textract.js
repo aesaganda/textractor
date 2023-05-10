@@ -1,6 +1,5 @@
 const { createWorker } = require("tesseract.js");
-const fs = require("fs");
-const { PDFDocument } = require("pdf-lib");
+const fs = require('fs');
 
 const imageRecognize = async (req, res) => {
   const { imageUrl, language } = req.body;
@@ -70,17 +69,16 @@ const imageDetect = async (req, res) => {
   }
 };
 
-const imageToPdf = async (req, res) => {
-  const { imagePath, lang } = req.body;
+const downloadPDF = async (req, res) => {
+  const { imageUrl, language } = req.body;
 
-  if (!imagePath) {
+  if (!imageUrl) {
     return res.status(400).send("Missing imageUrl");
   }
 
-  if (!lang) {
+  if (!language) {
     return res.status(400).send("Missing language");
   }
-
   try {
     // Recognize text in image using Tesseract.js
     const worker = await createWorker({
@@ -88,38 +86,28 @@ const imageToPdf = async (req, res) => {
       logger: (m) => console.log(m),
     });
 
-    await worker.loadLanguage(lang);
-    await worker.initialize(lang);
+    await worker.loadLanguage(language);
+    await worker.initialize(language);
 
-    const { data } = await worker.recognize(imagePath);
-    const { text } = await data;
+    const myImage = imageUrl;
+
+    const {
+      data: { text, pdf },
+    } = await worker.recognize(myImage, { pdfTitle: 'Textractor Result' }, { pdf: true });
+    console.log(text);
+
+    fs.writeFileSync('textractor-result.pdf', Buffer.from(pdf));
+    console.log('Generate PDF: textractor-result.pdf');
     await worker.terminate();
 
-    // PDF oluşturma ve metni PDF'e yazma
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage();
-    page.drawText(text, { x: 50, y: 500 });
-
-    // PDF'i dosyaya yazma
-    const pdfBytes = await pdfDoc.save();
-    const outputPdfPath = `${Date.now()}.pdf`; // random create pdf name with date
-    fs.writeFileSync(outputPdfPath, pdfBytes);
-
-    res.download(outputPdfPath, (err) => {
-      if (err) {
-        res.status(500).send("PDF file dont download");
-      } else {
-        fs.unlinkSync(outputPdfPath);
-      }
-    });
+    res.status(200).send(text);
   } catch (error) {
-    console.log("Error:", error);
-    res.status(500).send("An error occurred while processing the pdf.");
+    res.status(500).send("An error occurred while processing the image.");
   }
 };
 
 module.exports = {
   imageRecognize,
   imageDetect,
-  imageToPdf,
+  downloadPDF,
 };
