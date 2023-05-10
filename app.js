@@ -1,5 +1,6 @@
 const express = require("express");
 const router = require("./src/routers/index");
+const mongoose = require("./src/database/db");
 const dotenv = require("dotenv");
 
 // swaggerUI
