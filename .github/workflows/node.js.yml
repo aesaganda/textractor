@@ -20,21 +20,6 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - name: Debugging with ssh
-      # You may pin to the exact commit or the version.
-      # uses: lhotari/action-upterm@d23c2722bdab893785c9fbeae314cbf080645bd7
-      uses: lhotari/action-upterm@v1
-      with:
-        # Github Token
-        GITHUB_TOKEN: # optional, default is ${{ github.token }}
-        # If only the public SSH keys of the user triggering the workflow should be authorized
-        limit-access-to-actor: # optional, default is false
-        # If only the public SSH keys of the listed GitHub users should be authorized
-        limit-access-to-users: # optional, default is 
-        # upterm server address (required), supported protocols are ssh, ws, or wss.
-        upterm-server: # default is ssh://uptermd.upterm.dev:22
-        # Content for ~/.ssh/known_hosts file on the server
-        ssh-known-hosts: # optional, default is upterm-server
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
