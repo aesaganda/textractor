@@ -1,5 +1,48 @@
-const { createWorker } = require("tesseract.js");
+const { createWorker, createScheduler } = require("tesseract.js");
 const fs = require("fs");
+
+const scheduler = createScheduler();
+
+// Creates worker and adds to scheduler
+const workerGen = async (req, res) => {
+
+  const worker = await createWorker({ cachePath: "." });
+  await worker.loadLanguage(req.body.language);
+  await worker.initialize(req.body.language);
+
+  const image = req.body.imageUrl;
+  console.log(`Processing ${image}`);
+
+  scheduler.addWorker(worker);
+}
+
+const workerN = 4;
+
+const schedule = async (req, res) => {
+  const { imageUrl, language } = req.body;
+
+  if (!imageUrl) {
+    return res.status(400).send("Missing imageUrl");
+  }
+
+  if (!language) {
+    return res.status(400).send("Missing language");
+  }
+  const resArr = Array(workerN);
+  for (let i = 0; i < workerN; i++) {
+    resArr[i] = workerGen(req, res);
+  }
+  await Promise.all(resArr);
+  /** Add 4 recognition jobs */
+  const results = await Promise.all(Array(10).fill(0).map(() => (
+    scheduler.addJob('recognize', imageUrl).then((x) => console.log(x.data.text))
+  )))
+
+  console.log(results);
+
+  await scheduler.terminate(); // It also terminates all workers.
+  res.status(200).send("Scheduler terminated successfully");
+};
 
 const convertImage = (imageSrc) => {
   const data = atob(imageSrc.split(',')[1])
@@ -161,4 +204,5 @@ module.exports = {
   imageDetect,
   downloadPDF,
   imageProcessing,
+  schedule,
 };
