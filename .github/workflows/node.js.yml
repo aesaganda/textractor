@@ -20,6 +20,7 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
+    - uses: actions/checkout@v3
     - name: Debugging with ssh
       # You may pin to the exact commit or the version.
       # uses: lhotari/action-upterm@d23c2722bdab893785c9fbeae314cbf080645bd7
@@ -35,7 +36,6 @@ jobs:
         upterm-server: # default is ssh://uptermd.upterm.dev:22
         # Content for ~/.ssh/known_hosts file on the server
         ssh-known-hosts: # optional, default is upterm-server
-    - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
