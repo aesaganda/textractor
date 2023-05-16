@@ -5,7 +5,6 @@ const scheduler = createScheduler();
 
 // Creates worker and adds to scheduler
 const workerGen = async (req, res) => {
-
   const worker = await createWorker({ cachePath: "." });
   await worker.loadLanguage(req.body.language);
   await worker.initialize(req.body.language);
@@ -14,13 +13,12 @@ const workerGen = async (req, res) => {
   console.log(`Processing ${image}`);
 
   scheduler.addWorker(worker);
-}
+};
 
 const workerN = 4;
 
 const schedule = async (req, res) => {
   const { imageUrl, language } = req.body;
-
   if (!imageUrl) {
     return res.status(400).send("Missing imageUrl");
   }
@@ -34,9 +32,11 @@ const schedule = async (req, res) => {
   }
   await Promise.all(resArr);
   /** Add 4 recognition jobs */
-  const results = await Promise.all(Array(10).fill(0).map(() => (
-    scheduler.addJob('recognize', imageUrl).then((x) => console.log(x.data.text))
-  )))
+  const results = await Promise.all(
+    Array(10)
+      .fill(0)
+      .map(() => scheduler.addJob("recognize", imageUrl).then((x) => console.log(x.data.text)))
+  );
 
   console.log(results);
 
@@ -45,12 +45,12 @@ const schedule = async (req, res) => {
 };
 
 const convertImage = (imageSrc) => {
-  const data = atob(imageSrc.split(',')[1])
-    .split('')
+  const data = atob(imageSrc.split(",")[1])
+    .split("")
     .map((c) => c.charCodeAt(0));
 
   return new Uint8Array(data);
-}
+};
 
 const imageProcessing = async (req, res) => {
   const { imageUrl, language } = req.body;
@@ -75,7 +75,9 @@ const imageProcessing = async (req, res) => {
     const image = imageUrl;
     console.log(`Processing ${image}`);
 
-    const { data: { imageColor, imageGrey, imageBinary } } = await worker.recognize(image, { rotateAuto: true }, { imageColor: true, imageGrey: true, imageBinary: true });
+    const {
+      data: { imageColor, imageGrey, imageBinary },
+    } = await worker.recognize(image, { rotateAuto: true }, { imageColor: true, imageGrey: true, imageBinary: true });
 
     console.log("Saving intermediate images: imageColor.png, imageGrey.png, imageBinary.png");
 
@@ -105,7 +107,7 @@ const imageRecognize = async (req, res) => {
   try {
     // Recognize text in image using Tesseract.js
     const worker = await createWorker({
-      // langPath: "../../lang-data/",
+      langPath: "../../lang-data/", //hata olursa burayı sil.
       logger: (m) => console.log(m),
     });
 
@@ -116,13 +118,16 @@ const imageRecognize = async (req, res) => {
     console.log(`Processing ${image}`);
 
     const {
-      data: { text },
+      data: { text, fontName },
     } = await worker.recognize(image);
     console.log(text);
 
     await worker.terminate();
 
-    res.status(200).send(text);
+    res.status(200).send({
+      text: text,
+      fontName: fontName ? fontName : "No font detected",
+    });
   } catch (error) {
     res.status(500).send("An error occurred while processing the image.");
   }
@@ -199,10 +204,65 @@ const downloadPDF = async (req, res) => {
   }
 };
 
+const fontFinder = async (req, res) => {
+  const { imageUrl, language } = req.body;
+
+  if (!imageUrl) {
+    return res.status(400).send("Missing imageUrl");
+  }
+
+  if (!language) {
+    return res.status(400).send("Missing language");
+  }
+
+  try {
+    // Recognize text in image using Tesseract.js
+    const worker = await createWorker({
+      // langPath: "../../lang-data/", //hata olursa burayı sil.
+      logger: (m) => console.log(m),
+    });
+
+    await worker.loadLanguage(language);
+    await worker.initialize(language);
+
+    const image = imageUrl;
+    console.log(`Processing ${image}`);
+
+    const { data } = await worker.recognize(image);
+    const { text, script } = data;
+
+    await worker.terminate();
+
+    // Perform font analysis on the recognized text
+    const fontName = analyzeFont(text, script);
+    console.log("fontName: ", fontName);
+
+    res.status(200).send({
+      text: text,
+      fontName: fontName ? fontName : "No font detected",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while processing the image.");
+  }
+};
+
+// Function to analyze the font of the text
+const analyzeFont = (text, script) => {
+  // Implement your font analysis logic here
+  // You can use external libraries or techniques to analyze the font based on the text and script
+
+  // Return the font name
+  return "FontName";
+};
+
+module.exports = fontFinder;
+
 module.exports = {
   imageRecognize,
   imageDetect,
   downloadPDF,
   imageProcessing,
   schedule,
+  fontFinder,
 };
