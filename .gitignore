@@ -10,3 +10,6 @@ node_modules
 *.bmp
 *.pb
 *.pdf
+
+# Ignore all files in the .gitignore file
+#google-cloud.json

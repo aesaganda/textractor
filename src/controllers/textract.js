@@ -1,5 +1,7 @@
 const { createWorker, createScheduler } = require("tesseract.js");
 const fs = require("fs");
+const { ImageAnnotatorClient } = require("@google-cloud/vision");
+const fontkit = require("fontkit");
 
 const scheduler = createScheduler();
 
@@ -124,9 +126,10 @@ const imageRecognize = async (req, res) => {
 
     await worker.terminate();
 
-    res.status(200).send({
-      text: text,
+    res.status(200).json({
+      data: text,
       fontName: fontName ? fontName : "No font detected",
+      message: "Success imageRecognize ",
     });
   } catch (error) {
     res.status(500).send("An error occurred while processing the image.");
@@ -205,41 +208,24 @@ const downloadPDF = async (req, res) => {
 };
 
 const fontFinder = async (req, res) => {
-  const { imageUrl, language } = req.body;
+  const { imageUrl } = req.body;
 
   if (!imageUrl) {
     return res.status(400).send("Missing imageUrl");
   }
 
-  if (!language) {
-    return res.status(400).send("Missing language");
-  }
-
   try {
-    // Recognize text in image using Tesseract.js
-    const worker = await createWorker({
-      // langPath: "../../lang-data/", //hata olursa burayı sil.
-      logger: (m) => console.log(m),
-    });
+    const client = new ImageAnnotatorClient();
+    const [result] = await client.textDetection(imageUrl);
+    const textAnnotations = result.textAnnotations;
+    const detectedText = textAnnotations[0].description;
 
-    await worker.loadLanguage(language);
-    await worker.initialize(language);
-
-    const image = imageUrl;
-    console.log(`Processing ${image}`);
-
-    const { data } = await worker.recognize(image);
-    const { text, script } = data;
-
-    await worker.terminate();
-
-    // Perform font analysis on the recognized text
-    const fontName = analyzeFont(text, script);
-    console.log("fontName: ", fontName);
+    // Font analizini gerçekleştirin
+    const fontName = analyzeFont(detectedText);
 
     res.status(200).send({
-      text: text,
-      fontName: fontName ? fontName : "No font detected",
+      text: detectedText,
+      fontName: fontName,
     });
   } catch (error) {
     console.error(error);
