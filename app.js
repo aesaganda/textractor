@@ -2,6 +2,7 @@ const express = require("express");
 const router = require("./src/routers/index");
 const mongoose = require("./src/database/db");
 const dotenv = require("dotenv");
+const cors = require("cors");
 
 // swaggerUI
 const swaggerUi = require("swagger-ui-express");
@@ -9,6 +10,15 @@ const swaggerFile = require("./swagger-output.json");
 
 // middleware
 const app = express();
+
+//add cors
+app.use(cors({
+  origin: "*",
+  credentials: true,
+  methods: "*",
+  allowedHeaders: "*"
+}))
+
 dotenv.config();
 
 const port = process.env.PORT || 8080;

@@ -122,7 +122,11 @@ const imageRecognize = async (req, res) => {
 
     await worker.terminate();
 
-    res.status(200).send(text);
+    res.status(200).json({
+      data: text,
+      message: "Success imageRecognize ",
+    });
+
   } catch (error) {
     res.status(500).send("An error occurred while processing the image.");
   }
