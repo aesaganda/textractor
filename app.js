@@ -33,7 +33,7 @@ app.use("/api", router);
 app.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.get("/", (req, res) => {
-  res.redirect("https://textractor.marun.tk");
+  res.redirect("https://textractor.netlify.app/");
 });
 
 
