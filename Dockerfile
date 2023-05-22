@@ -22,4 +22,4 @@ EXPOSE 3000
 
 # Run app
 
-CMD ["npm", "container"]
+ENTRYPOINT ["npm", "run", "container"]
