@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
-    "start-gendoc": "nodemon swagger.js",
+    "start-gendoc": "node swagger.js",
+    "container": "node app.js",
     "test": "node app.js"
   },
   "repository": {
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/aesaganda/textractor#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mongodb": "^5.4.0",

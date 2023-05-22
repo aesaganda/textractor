@@ -22,4 +22,4 @@ EXPOSE 3000
 
 # Run app
 
-CMD ["npm", "start"]
+ENTRYPOINT ["node", "app.js"]
