@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
-    "start-gendoc": "nodemon swagger.js",
+    "start-gendoc": "node swagger.js",
+    "container": "node app.js",
     "test": "node app.js"
   },
   "repository": {
