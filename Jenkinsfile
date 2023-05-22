@@ -1,13 +1,13 @@
 pipeline {
     agent any
     environment {
+        dockerHome = tool 'Dockins'
+        PATH = "${dockerHome}/bin:${env.PATH}"
         REGISTRY = 'ghcr.io'
         IMAGE_NAME = "${env.GITHUB_REPOSITORY}"
     }
     stages {
         stage('Initialize'){
-                def dockerHome = tool 'Dockins'
-                env.PATH = "${dockerHome}/bin:${env.PATH}"
             }
         stage('Checkout') {
             steps {
