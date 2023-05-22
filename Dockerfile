@@ -22,4 +22,4 @@ EXPOSE 3000
 
 # Run app
 
-ENTRYPOINT ["npm", "run", "container"]
+ENTRYPOINT ["node", "app.js"]
